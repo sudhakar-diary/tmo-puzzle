@@ -1,4 +1,4 @@
-import { Book, ReadingListItem } from '@tmo/shared/models';
+import { Book, Loader, ReadingListItem } from '@tmo/shared/models';
 
 export function createBook(id: string): Book {
   return {
@@ -19,5 +19,11 @@ export function createReadingListItem(bookId: string): ReadingListItem {
     authors: [`Author ${bookId}`],
     coverUrl: '',
     publishedDate: new Date(2020, 0, 1).toISOString()
+  };
+}
+
+export function createLoader(loadingValue: boolean): Loader {
+  return {
+    isLoading: loadingValue
   };
 }

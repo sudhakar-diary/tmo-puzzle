@@ -1,27 +1,28 @@
 <form [formGroup]="searchForm" (submit)="searchBooks()">
   <mat-form-field floatLabel="never">
-    <input
-      autoFocus
-      matInput
-      type="search"
-      placeholder="Search for books to add to your reading list"
-      formControlName="term"
-    />
-    <button mat-icon-button matSuffix>
+    <input autoFocus matInput type="search" placeholder="Search for books to add to your reading list"
+      formControlName="term" />
+    <button mat-icon-button matSuffix aria-label="search">
       <mat-icon>search</mat-icon>
     </button>
   </mat-form-field>
 </form>
+<div *ngIf="isloading$ | async">
+  <mat-spinner></mat-spinner>
+</div>
+<div *ngIf="bookSearchErr$ | async as errorContent" class="alert alert-danger">
+  {{errorContent}}
+</div>
 
-<ng-container *ngIf="searchTerm; else empty">
+<ng-container *ngIf="searchTerm && !(isloading$ | async); else empty">
   <div class="book-grid">
-    <div class="book" data-testing="book-item" *ngFor="let b of books">
+    <div class="book" data-testing="book-item" *ngFor="let b of getAllBooks$ | async">
       <div class="book--title">
         {{ b.title }}
       </div>
       <div class="book--content">
         <div class="book--content--cover">
-          <img src="{{ b.coverUrl }}" />
+          <img src="{{ b.coverUrl }}" alt="cover-image" />
         </div>
         <div class="book--content--info">
           <div><strong>Author:</strong> {{ b.authors.join(',') }}</div>
@@ -31,12 +32,7 @@
           </div>
           <p [innerHTML]="b.description"></p>
           <div>
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="addBookToReadingList(b)"
-              [disabled]="b.isAdded"
-            >
+            <button mat-flat-button color="primary" (click)="addBookToReadingList(b)" [disabled]="b.isAdded">
               Want to Read
             </button>
           </div>
@@ -48,9 +44,9 @@
 <ng-template #empty>
   <div class="empty">
     <p>
-      Try searching for a topic, for example "<a (click)="searchExample()"
-        >JavaScript</a
-      >".
+      Try searching for a topic, for example "<button aria-label="JavaScript" (click)="searchExample()"
+      class="btn-link"
+        >JavaScript</button>".
     </p>
   </div>
 </ng-template>
