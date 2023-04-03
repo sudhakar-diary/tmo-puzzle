@@ -13,6 +13,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { loaderAction } from 'libs/books/data-access/src/lib/+state/loader/loader.action';
 import { isLoaderLoading } from 'libs/books/data-access/src/lib/+state/loader/loader.selector';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'tmo-book-search',
@@ -40,6 +41,11 @@ export class BookSearchComponent implements OnInit, OnDestroy {
     this.getAllBooks$ = this.store.select(getAllBooks);
     this.isloading$ = this.store.select(isLoaderLoading);
     this.bookSearchErr$ = this.store.select(getBooksError);
+    this.subscriptionList.push(
+      this.searchForm.valueChanges.pipe(debounceTime(500), distinctUntilChanged()).subscribe(term => {
+        this.searchBooks();
+      }),
+    )
   }
 
   formatDate(date: void | string) {
