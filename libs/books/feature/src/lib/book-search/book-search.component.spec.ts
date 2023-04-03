@@ -1,11 +1,11 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, inject, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { createBook, SharedTestingModule } from '@tmo/shared/testing';
 
 import { BooksFeatureModule } from '../books-feature.module';
 import { BookSearchComponent } from './book-search.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { addToReadingList, clearSearch, getAllBooks, getBooksError, getBooksLoaded, searchBooks } from '@tmo/books/data-access';
+import { addToReadingList, clearSearch, getAllBooks, getBooksError, getBooksLoaded, searchBooks, showUndoAddReadListSnackBarAction, showUndoRemoveReadListSnackBarAAction } from '@tmo/books/data-access';
 import { Book } from '@tmo/shared/models';
 import { isLoaderLoading } from 'libs/books/data-access/src/lib/+state/loader/loader.selector';
 import { loaderAction } from 'libs/books/data-access/src/lib/+state/loader/loader.action';
@@ -39,6 +39,10 @@ describe('ProductsListComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    fixture.destroy();
+  });
+
   it('should create', () => {
     expect(component).toBeDefined();
   });
@@ -55,6 +59,16 @@ describe('ProductsListComponent', () => {
     const book: Book = createBook('B');
     component.addBookToReadingList(book);
     expect(store.dispatch).toHaveBeenCalledWith(addToReadingList({ book }));
+  });
+
+  it('should trigger snackBar to undo the addReadList', () => {
+    fixture.detectChanges();
+    const book: Book = createBook('B');
+    component.addBookToReadingList(book);
+    expect(store.dispatch).toHaveBeenCalledWith(addToReadingList({ book }));
+    expect(store.dispatch).toHaveBeenCalledTimes(3);
+    expect(store.dispatch).toHaveBeenCalledWith(showUndoAddReadListSnackBarAction({ showUndoAddReadListSnackBar: true }));
+    expect(store.dispatch).toHaveBeenCalledWith(showUndoRemoveReadListSnackBarAAction({ showUndoRemoveReadListSnackBar: false }));
   });
 
   it('should  search books with the search term', () => {
