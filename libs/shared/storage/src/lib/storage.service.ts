@@ -27,7 +27,7 @@ export class StorageService<T extends object = any> {
     if (serialized) {
       try {
         this.state = JSON.parse(serialized);
-      } catch {}
+      } catch { }
     }
     if (!this.state) {
       this.state = this.initialState;
