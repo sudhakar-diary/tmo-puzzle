@@ -1,31 +1,44 @@
-import { TestBed } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 import { ReplaySubject } from 'rxjs';
 import { provideMockActions } from '@ngrx/effects/testing';
-import { provideMockStore } from '@ngrx/store/testing';
+import { OverlayModule, OverlayContainer } from "@angular/cdk/overlay";
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpTestingController } from '@angular/common/http/testing';
 
 import { createBook, createReadingListItem, SharedTestingModule } from '@tmo/shared/testing';
 import { ReadingListEffects } from './reading-list.effects';
 import * as ReadingListActions from './reading-list.actions';
 
+let snackBar: MatSnackBar;
 describe('ToReadEffects', () => {
   let actions: ReplaySubject<any>;
   let effects: ReadingListEffects;
   let httpMock: HttpTestingController;
+  let store: MockStore;
+  let overlayContainerElement: HTMLElement;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SharedTestingModule],
+      imports: [SharedTestingModule, OverlayModule],
       providers: [
+        MatSnackBar,
+        OverlayContainer,
         ReadingListEffects,
         provideMockActions(() => actions),
-        provideMockStore()
+        provideMockStore({ initialState: { items: {} } }),
       ]
     });
-
+    store = TestBed.inject(MockStore);
     effects = TestBed.inject(ReadingListEffects);
     httpMock = TestBed.inject(HttpTestingController);
   });
+
+  beforeEach(inject([MatSnackBar, OverlayContainer],
+    (matSnackBar: MatSnackBar, overlayContainer: OverlayContainer) => {
+      snackBar = matSnackBar;
+      overlayContainerElement = overlayContainer.getContainerElement();
+    }));
 
   describe('loadReadingList$', () => {
     it('should work', done => {
