@@ -11,7 +11,7 @@ describe('Books Selectors', () => {
         [createBook('A'), createBook('B'), createBook('C')],
         {
           ...initialState,
-          error: 'Unknown error',
+          error:  `Something went wrong! Couldn't fetch Book details for the given search term!`,
           loaded: true
         }
       )
@@ -35,7 +35,7 @@ describe('Books Selectors', () => {
     it("getBooksError() should return the current 'error' state", () => {
       const result = BooksSelectors.getBooksError(state);
 
-      expect(result).toEqual('Unknown error');
+      expect(result).toEqual(`Something went wrong! Couldn't fetch Book details for the given search term!`);
     });
   });
 });

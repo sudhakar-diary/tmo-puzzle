@@ -19,7 +19,18 @@ export const getBooksLoaded = createSelector(
 
 export const getBooksError = createSelector(
   getBooksState,
-  (state: State) => state.error
-);
+  (state: State) => {
+    if (state && state.error) {
+      const errorResponse = state.error;
+      if (errorResponse) {
+        if (errorResponse['error'] && (errorResponse['error']['statusCode'] === 404
+          || errorResponse['error']['statusCode'] === 422)) {
+          return errorResponse['error']['message'];
+        } else {
+          return "Something went wrong! Couldn't fetch Book details for the given search term!";
+        }
+      }
+    }
+  });
 
 export const getBooks = createSelector(getBooksState, selectAll);
